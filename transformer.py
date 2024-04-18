@@ -4,9 +4,8 @@ import torch.nn.functional as F
 import math
 import copy
 
-from blocks.encoder_layer import EncoderLayer
+from blocks.encoder_layer import EncoderLayerPostLN
 from blocks.decoder_layer import DecoderLayer
-from blocks.feedforward import FeedForward
 from blocks.position_encoder import PositionEncoder
 
 
@@ -14,7 +13,7 @@ class Encoder(nn.Module):
 
     def __init__(self, d_model, n_heads, d_ff, dropout, n_layers) -> None:
         super().__init__()
-        layer = EncoderLayer(d_model, n_heads, d_ff, dropout)
+        layer = EncoderLayerPostLN(d_model, n_heads, d_ff, dropout)
         self.layers = nn.ModuleList([copy.deepcopy(layer) for _ in range(n_layers)])
     
     def forward(self, src, mask = None):
