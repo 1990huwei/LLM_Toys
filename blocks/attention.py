@@ -43,6 +43,9 @@ class MultiHeadAttention(nn.Module):
         out = self.fc_out(out)
         return out
 
+
+###test###
+
 model = MultiHeadAttention(128, 4, 0.5)
 
 v = torch.rand((5,80,128))
