@@ -18,8 +18,8 @@ class MultiHeadAttention(nn.Module):
         self.fc_out = nn.Linear(self.n_heads * self.d_head, d_model)
         self.dropout = nn.Dropout(dropout)
     
-    def forward(self, values, keys, query, mask=None):
-        batch_size = values.shape[0]
+    def forward(self, query, keys, values, mask=None):
+        batch_size = query.shape[0]
         d_head = self.d_head
         n_heads = self.n_heads
 

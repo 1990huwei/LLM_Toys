@@ -1,5 +1,4 @@
 import torch.nn as nn
-import torch.nn.functional as F
 
 from blocks.attention import MultiHeadAttention
 from blocks.feedforward import FeedForward
