@@ -18,7 +18,7 @@ class MultiHeadAttention(nn.Module):
         self.fc_out = nn.Linear(self.n_heads * self.d_head, d_model)
         self.dropout = nn.Dropout(dropout)
     
-    def forward(self, query, keys, values, mask=None):
+    def forward(self, query, keys, values, mask=None, padding_mask=None):
         batch_size = query.shape[0]
         d_head = self.d_head
         n_heads = self.n_heads
@@ -32,8 +32,13 @@ class MultiHeadAttention(nn.Module):
         query = self.q(query)
 
         score = torch.einsum('bqnd,bknd->bnqk', query, keys)
+
         if mask:
             score = score.masked_fill(mask == 0, -1e20)
+        
+        if padding_mask is not None:
+            padding_mask = padding_mask.unsqueeze(1).unsqueeze(1)
+            score = score.masked_fill(padding_mask, -1e20)
         
         attention = torch.softmax(score / (self.d_head ** 0.5), dim = -1)
         attention = self.dropout(attention)

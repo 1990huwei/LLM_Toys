@@ -15,8 +15,8 @@ class EncoderLayerPostLN(nn.Module):
         self.dropout1 = nn.Dropout(dropout)
         self.dropout2 = nn.Dropout(dropout)
 
-    def forward(self, src, src_mask = None):
-        src2 = self.multi_head_attention(src, src, src, mask = src_mask)
+    def forward(self, src, src_mask = None, padding_mask = None):
+        src2 = self.multi_head_attention(src, src, src, mask = src_mask, padding_mask = padding_mask)
         src2 = self.dropout1(src2)
         src = src + src2
         src = self.norm1(src)
@@ -41,9 +41,9 @@ class EncoderLayerPreLN(nn.Module):
         self.dropout1 = nn.Dropout(dropout)
         self.dropout2 = nn.Dropout(dropout)
     
-    def forward(self, src, src_mask = None):
+    def forward(self, src, src_mask = None, padding_mask = None):
         src2 = self.norm1(src)
-        src2 = self.multi_head_attention(src2, src2, src2, mask = src_mask)
+        src2 = self.multi_head_attention(src2, src2, src2, mask = src_mask, padding_mask = padding_mask)
         src2 = self.dropout1(src2)
         src = src + src2
 
