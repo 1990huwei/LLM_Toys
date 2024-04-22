@@ -11,11 +11,11 @@ class MultiHeadAttention(nn.Module):
         self.d_head = d_model // n_heads
         assert(self.d_head * n_heads == d_model)
 
-        self.v = nn.Linear(self.d_head, self.d_head, bias=False)
-        self.k = nn.Linear(self.d_head, self.d_head, bias=False)
-        self.q = nn.Linear(self.d_head, self.d_head, bias=False)
+        self.v = nn.Linear(d_model, d_model)
+        self.k = nn.Linear(d_model, d_model)
+        self.q = nn.Linear(d_model, d_model)
 
-        self.fc_out = nn.Linear(self.n_heads * self.d_head, d_model)
+        self.fc_out = nn.Linear(d_model, d_model)
         self.dropout = nn.Dropout(dropout)
     
     def forward(self, query, keys, values, mask=None, padding_mask=None):
@@ -23,20 +23,20 @@ class MultiHeadAttention(nn.Module):
         d_head = self.d_head
         n_heads = self.n_heads
 
-        values = values.reshape(batch_size, -1, n_heads, d_head)
-        keys = keys.reshape(batch_size, -1, n_heads, d_head)
-        query = query.reshape(batch_size, -1, n_heads, d_head)
-
         values = self.v(values)
         keys = self.k(keys)
         query = self.q(query)
+
+        values = values.reshape(batch_size, -1, n_heads, d_head)
+        keys = keys.reshape(batch_size, -1, n_heads, d_head)
+        query = query.reshape(batch_size, -1, n_heads, d_head)
 
         score = torch.einsum('bqnd,bknd->bnqk', query, keys)
 
         if mask:
             score = score.masked_fill(mask == 0, -1e20)
         
-        if padding_mask is not None:
+        if padding_mask:
             padding_mask = padding_mask.unsqueeze(1).unsqueeze(1)
             score = score.masked_fill(padding_mask, -1e20)
         
