@@ -38,3 +38,7 @@ class MultiHeadAttention(nn.Module):
 
         attention = torch.softmax(score / (d_head ** 0.5), dim = -1)
         attention = self.dropout(attention)
+
+        out = torch.einsum('bnqk,bknd->bqnd', attention, values).reshape(batch_size, -1, n_heads * d_head)
+        out = self.fc(out)
+        return out
