@@ -24,14 +24,14 @@ class MultiHeadAttention(nn.Module):
 
         query = self.q(query).reshape(batch_size, -1, n_heads, d_head)
         keys = self.k(keys).reshape(batch_size, -1, n_heads, d_head)
-        values = self.v(values).reshape(batch_size, n_heads, d_head)
+        values = self.v(values).reshape(batch_size, -1, n_heads, d_head)
 
         score = torch.einsum('bqnd,bknd->bnqk', query, keys)
 
         if mask:
             score = torch.masked_fill(score, mask = mask, value = -1e9)
         if padding_mask:
-            #padding_mask shape: (batch,seq_q)
+            #padding_mask shape: (batch,seq_k)
             #score shape: (batch,n_heads,seq_q,seq_k)
             padding_mask = padding_mask.unsqueeze(1).unsqueeze(1)
             score = torch.masked_fill(score, mask = padding_mask, value = -1e9)
